@@ -1,17 +1,44 @@
 package marketit.backend.project.customer.domain;
 
-import java.time.LocalDateTime;
+import lombok.*;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer {
 
-    Long customerId;
+    @Id @GeneratedValue
+    private Long customerId;
 
-    String email;
+    private String email;
 
-    String phoneNumber;
+    private String phoneNumber;
 
-    LocalDateTime regDate;
+    @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY)
+    private List<Address> addresses = new ArrayList<>();
 
-    CustomerStatus customerStatus;
+    private LocalDateTime regDate;
 
+    @Enumerated(EnumType.STRING)
+    private CustomerStatus customerStatus;
+
+    public void addAddress(Address address){
+        addresses.add(address);
+        address.setCustomer(this);
+    }
+
+    @Builder
+    public Customer(Long customerId, String email, String phoneNumber, List<Address> addresses, LocalDateTime regDate, CustomerStatus customerStatus) {
+        this.customerId = customerId;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.addresses = addresses;
+        this.regDate = regDate;
+        this.customerStatus = customerStatus;
+    }
 }
